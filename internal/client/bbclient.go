@@ -35,12 +35,16 @@ func MarkPriceKline(symbol string, start int64, end int64) {
 		}
 
 		body, _ := ioutil.ReadAll(response.Body)
-		dto := dto.MarkPriceKlineResponseDto{}
-		err := json.Unmarshal(body, &dto)
+		responseDto := dto.MarkPriceKlineResponseDto{}
+		err := json.Unmarshal(body, &responseDto)
 		if err != nil {
-			log.Fatal("error unmarshal MarkPriceKline:", err)
+			log.Fatal("error unmarshal mark-price-kline response:", err)
 		}
-		log.Println("response body:", dto)
+
+		for _, item := range responseDto.Result.List {
+			candle := dto.NewMarkPriceKlineCandleDto(responseDto.Result.Symbol, item[0], item[1], item[2], item[3], item[4])
+			log.Println("response body:", candle)
+		}
 
 		response.Body.Close()
 

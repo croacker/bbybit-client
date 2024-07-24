@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 )
@@ -25,6 +26,10 @@ type MarkPriceKlineCandleDto struct {
 	HighPrice  float64
 	LowPrice   float64
 	ClosePrice float64
+}
+
+func (d MarkPriceKlineCandleDto) String() string {
+	return fmt.Sprintf("symbol: %v, startTime:%v, openPrice:%v, highPrice:%v, lowPrice:%v, closePrice:%v", d.Symbol, d.StartTime, d.OpenPrice, d.HighPrice, d.LowPrice, d.ClosePrice)
 }
 
 func NewMarkPriceKlineCandleDto(symbol string, startTime string, openPrice string, highPrice string, lowPrice string, closePrice string) *MarkPriceKlineCandleDto {

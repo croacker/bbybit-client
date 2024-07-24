@@ -2,7 +2,7 @@ package client
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -34,7 +34,7 @@ func MarkPriceKline(symbol string, start int64, end int64) {
 			panic(error)
 		}
 
-		body, _ := ioutil.ReadAll(response.Body)
+		body, _ := io.ReadAll(response.Body)
 		responseDto := dto.MarkPriceKlineResponseDto{}
 		err := json.Unmarshal(body, &responseDto)
 		if err != nil {
@@ -43,7 +43,7 @@ func MarkPriceKline(symbol string, start int64, end int64) {
 
 		for _, item := range responseDto.Result.List {
 			candle := dto.NewMarkPriceKlineCandleDto(responseDto.Result.Symbol, item[0], item[1], item[2], item[3], item[4])
-			log.Println("response body:", candle)
+			log.Println("candle:", candle)
 		}
 
 		response.Body.Close()

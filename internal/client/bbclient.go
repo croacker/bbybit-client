@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/croacker/bybit-client/internal/dto"
+	"github.com/croacker/bybit-client/internal/store"
 )
 
 const BB_URL string = "https://api-testnet.bybit.com"
@@ -44,6 +45,7 @@ func MarkPriceKline(symbol string, start int64, end int64) {
 		for _, item := range responseDto.Result.List {
 			candle := dto.NewMarkPriceKlineCandleDto(responseDto.Result.Symbol, item[0], item[1], item[2], item[3], item[4])
 			log.Println("candle:", candle)
+			processCandle(candle)
 		}
 
 		response.Body.Close()
@@ -52,6 +54,11 @@ func MarkPriceKline(symbol string, start int64, end int64) {
 		start += INTERVAL // TODO
 		end += INTERVAL   // TODO
 	}
+}
+
+func processCandle(candle *dto.MarkPriceKlineCandleDto) {
+	storedItem := store.GetStoreItem(candle.Symbol)
+	log.Println("stored item:", storedItem)
 }
 
 func toUrl(symbol string, start int64, end int64) string {

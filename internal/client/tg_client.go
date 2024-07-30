@@ -3,11 +3,29 @@ package client
 import (
 	"log"
 
+	"github.com/croacker/bybit-client/internal/config"
 	tg_bot_api "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+var tgClient *TgBotClient
+
 type TgBotClient struct {
-	
+	token        string
+	outgoingChan chan string
+	chatIds      map[int64]int64
+}
+
+func NewTgClient(cfg *config.AppConfig) *TgBotClient {
+	tgClient = &TgBotClient{
+		cfg.TgClient.Token,
+		make(chan string),
+		make(map[int64]int64),
+	}
+	return tgClient
+}
+
+func (t *TgBotClient) GetOutgoingChannel() chan string {
+	return t.outgoingChan
 }
 
 func StartBot() {
@@ -29,6 +47,7 @@ func readIncoming(bot *tg_bot_api.BotAPI) {
 	for update := range updates {
 		id := getChatId(update)
 		if id != -1 {
+			saveChatId(id)
 			if update.Message != nil {
 				log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
@@ -42,7 +61,12 @@ func readIncoming(bot *tg_bot_api.BotAPI) {
 }
 
 func writeOutgoing(bot *tg_bot_api.BotAPI) {
-
+	for msg := range tgClient.outgoingChan {
+		log.Println("out msg:", msg)
+		for id, _ := range tgClient.chatIds {
+			log.Println("send msg to:", id)
+		}
+	}
 }
 
 func getChatId(update tg_bot_api.Update) int64 {
@@ -56,4 +80,10 @@ func getChatId(update tg_bot_api.Update) int64 {
 	}
 
 	return result
+}
+
+func saveChatId(id int64) {
+	if _, ok := tgClient.chatIds[id]; !ok {
+		tgClient.chatIds[id] = id
+	}
 }

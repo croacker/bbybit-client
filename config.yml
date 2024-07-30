@@ -1,3 +1,10 @@
+bb-client:
+  url: https://api-testnet.bybit.com
+  api-key: 
+  api-secret: 
+  interval-sec: 15
+tg-client:
+  token: 
 symbols:
   - BTCUSDT
   - FOXYUSDT

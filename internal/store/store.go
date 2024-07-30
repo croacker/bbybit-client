@@ -23,7 +23,7 @@ func GetStore() *CandleStore {
 	return store
 }
 
-func GetStoreItem(symbol string) *CandleStoreItem {
+func GetStoredItem(symbol string) *CandleStoreItem {
 	s := GetStore()
 	item, found := s.Items[symbol]
 	if !found {
@@ -31,4 +31,9 @@ func GetStoreItem(symbol string) *CandleStoreItem {
 		s.Items[symbol] = item
 	}
 	return &item
+}
+
+func StoreItem(item *CandleStoreItem) {
+	s := GetStore()
+	s.Items[item.Symbol] = *item
 }

@@ -6,6 +6,10 @@ import (
 	tg_bot_api "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+type TgBotClient struct {
+	
+}
+
 func StartBot() {
 	bot, err := tg_bot_api.NewBotAPI("") // TODO bot token
 	if err != nil {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"runtime"
@@ -25,13 +26,25 @@ func main() {
 	candlesCh := bbClient.GetOutgoingChannel()
 	bbClient.Start()
 
-	go readCandles(candlesCh)
+	tgClient := client.NewTgClient(appConfig)
+	tgOutgoingCh := tgClient.GetOutgoingChannel()
+	tgClient.Start()
+
+	go readCandles(candlesCh, tgOutgoingCh)
+
+	go writeMessages(tgOutgoingCh)
 
 	runtime.Goexit()
 }
 
-func readCandles(candlesCh chan *dto.MarkPriceKlineCandleDto) {
+func readCandles(candlesCh chan *dto.MarkPriceKlineCandleDto, tgOutgoingCh chan string) {
 	for candle := range candlesCh {
+		msg := fmt.Sprintf("%v", candle)
+		tgOutgoingCh <- msg
 		log.Println("receive candle: ", candle)
 	}
+}
+
+func writeMessages(tgOutgoingCh chan string) {
+
 }

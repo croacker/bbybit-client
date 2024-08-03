@@ -48,10 +48,7 @@ func NewBbClient(cfg *config.AppConfig) *MarkPriceKlineClient {
 func (c *MarkPriceKlineClient) Start() {
 	log.Println("start bb-client...")
 
-	endMs := getEndMilis()
-	startMs := endMs - ONE_MINUTE
-
-	go loopRequests(c.symbols, startMs, endMs)
+	go loopRequests(c.symbols, c.interval)
 	log.Println("bb-client started")
 }
 
@@ -59,7 +56,9 @@ func (c *MarkPriceKlineClient) GetOutgoingChannel() chan *dto.MarkPriceKlineCand
 	return c.outgoingChan
 }
 
-func loopRequests(symbols []string, start int64, end int64) {
+func loopRequests(symbols []string, interval int32) {
+	end := getEndMilis()
+	start := end - ONE_MINUTE
 	for {
 		for _, symbol := range symbols {
 			body := requestMarkPriceKline(symbol, start, end)
@@ -68,6 +67,9 @@ func loopRequests(symbols []string, start int64, end int64) {
 				bbClient.outgoingChan <- candle
 			}
 		}
+		end += INTERVAL
+		start += INTERVAL
+		time.Sleep(time.Duration(interval) * time.Second)
 	}
 }
 

@@ -28,14 +28,16 @@ func (t *TgBotClient) GetOutgoingChannel() chan string {
 	return t.outgoingChan
 }
 
-func StartBot() {
-	bot, err := tg_bot_api.NewBotAPI("") // TODO bot token
+func (t *TgBotClient) Start() {
+	log.Println("start tg-client...")
+	bot, err := tg_bot_api.NewBotAPI(t.token)
 	if err != nil {
 		panic(err)
 	}
 
 	go readIncoming(bot)
 	go writeOutgoing(bot)
+	log.Println("tg-client started")
 }
 
 func readIncoming(bot *tg_bot_api.BotAPI) {
@@ -65,6 +67,8 @@ func writeOutgoing(bot *tg_bot_api.BotAPI) {
 		log.Println("out msg:", msg)
 		for id, _ := range tgClient.chatIds {
 			log.Println("send msg to:", id)
+			tgMsg := tg_bot_api.NewMessage(id, msg)
+			bot.Send(tgMsg)
 		}
 	}
 }
@@ -84,6 +88,7 @@ func getChatId(update tg_bot_api.Update) int64 {
 
 func saveChatId(id int64) {
 	if _, ok := tgClient.chatIds[id]; !ok {
+		log.Println("tg register new chat:", id)
 		tgClient.chatIds[id] = id
 	}
 }

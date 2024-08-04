@@ -13,6 +13,7 @@ const CONFIG_TYPE = "yaml"
 type AppConfig struct {
 	BbClient BbClientConfig `mapstructure:"bb-client"`
 	TgClient TgClientConfig `mapstructure:"tg-client"`
+	DbCfg    DbConfig       `mapstructure:"db"`
 	Symbols  []string       `mapstructure:"symbols"`
 }
 
@@ -25,6 +26,10 @@ type BbClientConfig struct {
 
 type TgClientConfig struct {
 	Token string `mapstructure:"token"`
+}
+
+type DbConfig struct {
+	Path string `mapstructure:"path"`
 }
 
 var appConfig *AppConfig

@@ -9,6 +9,7 @@ import (
 
 	"github.com/croacker/bybit-client/internal/client"
 	"github.com/croacker/bybit-client/internal/config"
+	"github.com/croacker/bybit-client/internal/db"
 	"github.com/croacker/bybit-client/internal/dto"
 )
 
@@ -21,6 +22,9 @@ func httpClient() *http.Client {
 
 func main() {
 	appConfig := config.LoadConfig()
+
+	db.SetupDb(appConfig)
+	db.AllChats()
 
 	bbClient := client.NewBbClient(appConfig)
 	candlesCh := bbClient.GetOutgoingChannel()

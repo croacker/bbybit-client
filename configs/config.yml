@@ -5,6 +5,8 @@ bb-client:
   interval-sec: 15
 tg-client:
   token: 
+db:
+  path: ./bb-client.db  
 symbols:
   - BTCUSDT
   - FOXYUSDT

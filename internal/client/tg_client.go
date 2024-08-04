@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/croacker/bybit-client/internal/config"
+	"github.com/croacker/bybit-client/internal/db"
 	tg_bot_api "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -49,7 +50,8 @@ func readIncoming(bot *tg_bot_api.BotAPI) {
 	for update := range updates {
 		id := getChatId(update)
 		if id != -1 {
-			saveChatId(id)
+			saveChatId(update)
+
 			if update.Message != nil {
 				log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
@@ -86,9 +88,31 @@ func getChatId(update tg_bot_api.Update) int64 {
 	return result
 }
 
-func saveChatId(id int64) {
-	if _, ok := tgClient.chatIds[id]; !ok {
-		log.Println("tg register new chat:", id)
-		tgClient.chatIds[id] = id
+func getChatInfo(update tg_bot_api.Update) *tg_bot_api.Chat {
+	var result *tg_bot_api.Chat
+	if update.Message != nil {
+		result = update.Message.Chat
 	}
+
+	if update.CallbackQuery != nil {
+		result = update.CallbackQuery.Message.Chat
+	}
+
+	return result
+}
+
+func saveChatId(update tg_bot_api.Update) {
+	chat := getChatInfo(update)
+	dbChat := db.TgChat{
+		chat.ID,
+		chat.Type,
+		chat.UserName,
+		chat.FirstName,
+		chat.LastName,
+	}
+	db.SaveChat(dbChat)
+	// if _, ok := tgClient.chatIds[id]; !ok {
+	// 	log.Println("tg register new chat:", id)
+	// 	tgClient.chatIds[id] = id
+	// }
 }

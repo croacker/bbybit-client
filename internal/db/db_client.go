@@ -50,13 +50,10 @@ func SaveChat(chat TgChat) {
 	defer db.Close()
 
 	k := []byte(strconv.FormatInt(chat.Id, 10))
-	v, err := json.Marshal(chat)
-	if err != nil {
-		log.Fatal("error marshal chat:", err)
-	}
+	v := marshalChat(chat)
 
-	err = db.Update(func(tx *bbolt.Tx) error {
-		err = tx.Bucket([]byte("DB")).Put(k, v)
+	err := db.Update(func(tx *bbolt.Tx) error {
+		err := tx.Bucket([]byte("DB")).Bucket([]byte("TG_CHAT")).Put(k, v)
 		if err != nil {
 			return fmt.Errorf("error save chat:%v", err)
 		}
@@ -67,14 +64,17 @@ func SaveChat(chat TgChat) {
 	}
 }
 
-func AllChats() {
+func AllChats() []TgChat {
 	db := OpenDb()
 	defer db.Close()
+
+	chats := make([]TgChat, 0)
 
 	err := db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte("DB")).Bucket([]byte("TG_CHAT"))
 		b.ForEach(func(k, v []byte) error {
-			fmt.Println(string(k), string(v))
+			chat := unmarshalChat(v)
+			chats = append(chats, chat)
 			return nil
 		})
 		return nil
@@ -82,4 +82,22 @@ func AllChats() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return chats
+}
+
+func marshalChat(chat TgChat) []byte {
+	b, err := json.Marshal(chat)
+	if err != nil {
+		log.Fatal("error marshal chat:", err)
+	}
+	return b
+}
+
+func unmarshalChat(b []byte) TgChat {
+	chat := TgChat{}
+	err := json.Unmarshal(b, &chat)
+	if err != nil {
+		log.Fatal("error unmarshal chat:", b)
+	}
+	return chat
 }

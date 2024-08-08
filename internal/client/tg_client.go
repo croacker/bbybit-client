@@ -67,10 +67,13 @@ func readIncoming(bot *tg_bot_api.BotAPI) {
 func writeOutgoing(bot *tg_bot_api.BotAPI) {
 	for msg := range tgClient.outgoingChan {
 		log.Println("out msg:", msg)
-		for id, _ := range tgClient.chatIds {
-			log.Println("send msg to:", id)
+		for _, chat := range db.AllChats() {
+			id := chat.Id
 			tgMsg := tg_bot_api.NewMessage(id, msg)
-			bot.Send(tgMsg)
+			_, err := bot.Send(tgMsg)
+			if err != nil {
+				log.Println("error send message to:", chat)
+			}
 		}
 	}
 }

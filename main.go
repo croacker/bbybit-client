@@ -24,7 +24,10 @@ func main() {
 	appConfig := config.LoadConfig()
 
 	db.SetupDb(appConfig)
-	db.AllChats()
+	db.SaveChat(db.TgChat{1, "type", "username", "firstname", "lastname"})
+	for _, chat := range db.AllChats() {
+		log.Println("chat:", chat)
+	}
 
 	bbClient := client.NewBbClient(appConfig)
 	candlesCh := bbClient.GetOutgoingChannel()

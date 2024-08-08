@@ -1,5 +1,9 @@
 package store
 
+import (
+	"fmt"
+)
+
 type CandleStore struct {
 	Items map[string]CandleStoreItem
 }
@@ -14,6 +18,10 @@ type CandleStoreItem struct {
 }
 
 var store *CandleStore
+
+func (c CandleStoreItem) String() string {
+	return fmt.Sprintf("symbol: %v, startTime:%v, openPrice:%v, highPrice:%v, lowPrice:%v, closePrice:%v", c.Symbol, c.StartTime, c.OpenPrice, c.HighPrice, c.LowPrice, c.ClosePrice)
+}
 
 func GetStore() *CandleStore {
 	if store == nil {

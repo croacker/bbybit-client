@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"runtime"
 	"time"
@@ -11,6 +10,7 @@ import (
 	"github.com/croacker/bybit-client/internal/config"
 	"github.com/croacker/bybit-client/internal/db"
 	"github.com/croacker/bybit-client/internal/dto"
+	"github.com/croacker/bybit-client/internal/processor"
 )
 
 const ONE_MINUTE = 960000
@@ -24,10 +24,6 @@ func main() {
 	appConfig := config.LoadConfig()
 
 	db.SetupDb(appConfig)
-	db.SaveChat(db.TgChat{1, "type", "username", "firstname", "lastname"})
-	for _, chat := range db.AllChats() {
-		log.Println("chat:", chat)
-	}
 
 	bbClient := client.NewBbClient(appConfig)
 	candlesCh := bbClient.GetOutgoingChannel()
@@ -46,9 +42,11 @@ func main() {
 
 func readCandles(candlesCh chan *dto.MarkPriceKlineCandleDto, tgOutgoingCh chan string) {
 	for candle := range candlesCh {
-		msg := fmt.Sprintf("%v", candle)
-		tgOutgoingCh <- msg
-		log.Println("receive candle: ", candle)
+		if processor.NeedSendAlert(candle) {
+			msg := fmt.Sprintf("%v", candle)
+			tgOutgoingCh <- msg
+			//log.Println("receive candle: ", candle)
+		}
 	}
 }
 

@@ -4,14 +4,12 @@ import (
 	"encoding/json"
 	"io"
 	"log"
-	"math"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/croacker/bybit-client/internal/config"
 	"github.com/croacker/bybit-client/internal/dto"
-	"github.com/croacker/bybit-client/internal/store"
 )
 
 const BB_URL string = "https://api-testnet.bybit.com"
@@ -111,37 +109,6 @@ func unmarshalBody(body []byte) *dto.MarkPriceKlineResponseDto {
 		log.Fatal("error unmarshal mark-price-kline response:", err)
 	}
 	return &responseDto
-}
-
-func processCandle(candle *dto.MarkPriceKlineCandleDto) {
-	storedItem := store.GetStoredItem(candle.Symbol)
-	log.Println("stored item:", storedItem)
-	if storedItem.StartTime != 0 {
-		if isAlert(storedItem.OpenPrice, candle.OpenPrice) {
-			log.Println("!!!! new price:", candle.OpenPrice)
-		}
-		if isAlert(storedItem.HighPrice, candle.HighPrice) {
-			log.Println("!!!! new price:", candle.HighPrice)
-		}
-		if isAlert(storedItem.LowPrice, candle.LowPrice) {
-			log.Println("!!!! new price:", candle.LowPrice)
-		}
-		if isAlert(storedItem.ClosePrice, candle.ClosePrice) {
-			log.Println("!!!! new price:", candle.ClosePrice)
-		}
-	}
-	storedItem.StartTime = candle.StartTime
-	storedItem.OpenPrice = candle.OpenPrice
-	storedItem.HighPrice = candle.HighPrice
-	storedItem.LowPrice = candle.LowPrice
-	storedItem.ClosePrice = candle.ClosePrice
-	store.StoreItem(storedItem)
-}
-
-func isAlert(oldPrice float64, newPrice float64) bool {
-	percents15 := oldPrice * 0.15
-	delta := math.Abs(oldPrice - newPrice)
-	return delta > percents15
 }
 
 func toUrl(symbol string, start int64, end int64) string {

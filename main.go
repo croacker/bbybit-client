@@ -10,7 +10,7 @@ import (
 	"github.com/croacker/bybit-client/internal/config"
 	"github.com/croacker/bybit-client/internal/db"
 	"github.com/croacker/bybit-client/internal/dto"
-	"github.com/croacker/bybit-client/internal/processor"
+	"github.com/croacker/bybit-client/internal/service"
 )
 
 const ONE_MINUTE = 960000
@@ -42,7 +42,7 @@ func main() {
 
 func readCandles(candlesCh chan *dto.MarkPriceKlineCandleDto, tgOutgoingCh chan string) {
 	for candle := range candlesCh {
-		if processor.NeedSendAlert(candle) {
+		if service.NeedSendAlert(candle) {
 			msg := fmt.Sprintf("%v", candle)
 			tgOutgoingCh <- msg
 		}

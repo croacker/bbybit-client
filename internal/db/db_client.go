@@ -10,7 +10,6 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-// var db *bbolt.
 var dbPath string
 
 func SetupDb(cfg *config.AppConfig) {

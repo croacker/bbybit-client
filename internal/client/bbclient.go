@@ -23,7 +23,7 @@ type MarkPriceKlineClient struct {
 	symbols      []string
 	bbUrl        string
 	interval     int32
-	outgoingChan chan *dto.MarkPriceKlineCandleDto // TODO incoming????
+	outgoingChan chan *dto.MarkPriceKlineCandleDto
 }
 
 type ReqDetails struct {

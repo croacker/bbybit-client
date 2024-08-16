@@ -113,8 +113,4 @@ func saveChatId(update tg_bot_api.Update) {
 		chat.LastName,
 	}
 	db.SaveChat(dbChat)
-	// if _, ok := tgClient.chatIds[id]; !ok {
-	// 	log.Println("tg register new chat:", id)
-	// 	tgClient.chatIds[id] = id
-	// }
 }

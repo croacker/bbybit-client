@@ -45,7 +45,6 @@ func readCandles(candlesCh chan *dto.MarkPriceKlineCandleDto, tgOutgoingCh chan 
 		if processor.NeedSendAlert(candle) {
 			msg := fmt.Sprintf("%v", candle)
 			tgOutgoingCh <- msg
-			//log.Println("receive candle: ", candle)
 		}
 	}
 }
